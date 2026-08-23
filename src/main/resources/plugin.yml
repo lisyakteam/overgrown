@@ -1,0 +1,4 @@
+name: Overgrown
+version: '1.0'
+main: me.junioraww.overgrown.Main
+api-version: '1.21'
