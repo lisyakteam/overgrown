@@ -1,0 +1,22 @@
+settings:
+  min-y: 40
+  growth-interval-seconds: 60
+  blocks-per-cycle: 10
+  max-catchup-cycles: 100
+whitelisted-worlds:
+  - "world"
+chances:
+  OAK_LEAVES: 70
+  VINE: 20
+  COBWEB: 10
+target-blocks:
+  - "#minecraft:planks"
+  - "#minecraft:stairs"
+  - "#minecraft:slabs"
+  - "#minecraft:terracotta"
+  - "#minecraft:stone_bricks"
+  - "CUT_SANDSTONE"
+  - "BRICKS"
+replace-blocks:
+  STONE_BRICKS: CRACKED_STONE_BRICKS
+  POLISHED_BLACKSTONE_BRICKS: CRACKED_POLISHED_BLACKSTONE_BRICKS
