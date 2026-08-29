@@ -13,6 +13,7 @@ public class Config {
   private static long intervalMillis;
   private static int blocksPerCycle;
   private static int maxCatchupCycles;
+  private static boolean recoveryEnabled;
 
   private static Map<Material, Double> growthChances = new HashMap<>();
   private static Set<Material> targetBlocks = new HashSet<>();
@@ -35,6 +36,10 @@ public class Config {
 
   public static int getMinY() {
     return minY;
+  }
+
+  public static boolean isRecoveryEnabled() {
+    return recoveryEnabled;
   }
 
   public static Map<Material, Double> getGrowthChances() {
@@ -71,22 +76,6 @@ public class Config {
 
   public static void setMinY(int value) {
     minY = value;
-  }
-
-  public static void setGrowthChances(Map<Material, Double> growthChances) {
-    Config.growthChances = growthChances;
-  }
-
-  public static void setReplaceBlocks(Map<Material, Material> replaceBlocks) {
-    Config.replaceBlocks = replaceBlocks;
-  }
-
-  public static void setTargetBlocks(Set<Material> targetBlocks) {
-    Config.targetBlocks = targetBlocks;
-  }
-
-  public static void setWhitelistedWorlds(Set<String> whitelistedWorlds) {
-    Config.whitelistedWorlds = whitelistedWorlds;
   }
 
   public static void setLastUpdateKey(NamespacedKey lastUpdateKey) {

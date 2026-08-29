@@ -1,7 +1,7 @@
 settings:
   min-y: 40
-  growth-interval-seconds: 60
-  blocks-per-cycle: 10
+  growth-interval-seconds: 300
+  blocks-per-cycle: 1
   max-catchup-cycles: 100
 whitelisted-worlds:
   - "world"
@@ -15,7 +15,6 @@ target-blocks:
   - "#minecraft:slabs"
   - "#minecraft:terracotta"
   - "#minecraft:stone_bricks"
-  - "CUT_SANDSTONE"
   - "BRICKS"
 replace-blocks:
   STONE_BRICKS: CRACKED_STONE_BRICKS

@@ -1,7 +1,7 @@
 package me.junioraww.overgrown;
 
-import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import me.junioraww.overgrown.commands.OvergrownCommand;
+import me.junioraww.overgrown.features.Restoration;
 import me.junioraww.overgrown.listeners.ChunkEvents;
 import me.junioraww.overgrown.utils.Config;
 import org.bukkit.Bukkit;
@@ -41,6 +41,7 @@ public class Main extends JavaPlugin {
 
     chunkEvents = new ChunkEvents();
     getServer().getPluginManager().registerEvents(chunkEvents, this);
+    getServer().getPluginManager().registerEvents(new Restoration(), this);
     getCommand("overgrown").setExecutor(new OvergrownCommand(this));
   }
 
@@ -118,18 +119,16 @@ public class Main extends JavaPlugin {
           if (toPlace != null) {
             BlockData blockData = toPlace.createBlockData();
 
-            // Обработка листвы (запрещаем гнить)
             if (blockData instanceof Leaves leaves) {
               leaves.setPersistent(true);
             }
-            // Обработка лиан и других блоков, зависящих от стороны (приклеиваем к блоку)
+
             else if (blockData instanceof MultipleFacing facing) {
               BlockFace attachFace = randomFace.getOppositeFace();
-              // Проверяем, может ли этот блок существовать на этой стороне
               if (facing.getAllowedFaces().contains(attachFace)) {
                 facing.setFace(attachFace, true);
               } else {
-                continue; // Пропускаем попытку (например, лианы не ставятся на пол)
+                continue;
               }
             }
 
