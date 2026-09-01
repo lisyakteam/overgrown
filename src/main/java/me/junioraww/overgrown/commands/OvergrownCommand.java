@@ -18,13 +18,13 @@ public class OvergrownCommand implements CommandExecutor {
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
     if (args.length == 0) {
-      sender.sendMessage("§cИспользование: /overgrown world <add|remove|list> [мир]");
+      sender.sendRichMessage("<red>Usage: /overgrown world <add|remove|list> [world]");
       return true;
     }
 
     if (args[0].equalsIgnoreCase("world")) {
       if (args.length < 2) {
-        sender.sendMessage("§cУкажите действие: add, remove, list");
+        sender.sendRichMessage("<red>Specify an action: add, remove, list");
         return true;
       }
 
@@ -33,12 +33,12 @@ public class OvergrownCommand implements CommandExecutor {
 
       switch (action) {
         case "list":
-          sender.sendMessage("§aМиры в вайтлисте: §f" + String.join(", ", Config.getWhitelistedWorlds()));
+          sender.sendRichMessage("<green>Whitelisted worlds: <white>" + String.join(", ", Config.getWhitelistedWorlds()));
           break;
 
         case "add":
           if (args.length < 3) {
-            sender.sendMessage("§cУкажите название мира.");
+            sender.sendRichMessage("<red>Specify a world name.");
             return true;
           }
           String worldToAdd = args[2];
@@ -46,15 +46,15 @@ public class OvergrownCommand implements CommandExecutor {
             worldsList.add(worldToAdd);
             plugin.getConfig().set("whitelisted-worlds", worldsList);
             plugin.saveConfig();
-            sender.sendMessage("§aМир " + worldToAdd + " добавлен в вайтлист.");
+            sender.sendRichMessage("<green>World " + worldToAdd + " has been added to the whitelist.");
           } else {
-            sender.sendMessage("§cЭтот мир уже в вайтлисте.");
+            sender.sendRichMessage("<red>This world is already in the whitelist.");
           }
           break;
 
         case "remove":
           if (args.length < 3) {
-            sender.sendMessage("§cУкажите название мира.");
+            sender.sendRichMessage("<red>Specify a world name.");
             return true;
           }
           String worldToRemove = args[2];
@@ -62,14 +62,12 @@ public class OvergrownCommand implements CommandExecutor {
             worldsList.remove(worldToRemove);
             plugin.getConfig().set("whitelisted-worlds", worldsList);
             plugin.saveConfig();
-            sender.sendMessage("§aМир " + worldToRemove + " удален из вайтлиста.");
-          } else {
-            sender.sendMessage("§cЭтого мира нет в вайтлисте.");
-          }
+            sender.sendRichMessage("<green>World " + worldToRemove + " has been removed from the whitelist.");
+          } else sender.sendRichMessage("<red>This world is not in the whitelist.");
           break;
 
         default:
-          sender.sendMessage("§cНеизвестное действие.");
+          sender.sendRichMessage("<red>Unknown action.");
           break;
       }
       return true;
