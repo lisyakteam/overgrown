@@ -1,8 +1,10 @@
 package me.junioraww.overgrown.features;
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import me.junioraww.overgrown.Main;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -17,17 +19,15 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Transformation;
 import org.joml.Vector3f;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Restoration implements Listener {
-  private static final Map<Location, RestorationState> activeRestorations = new HashMap<>();
+  private static final Map<Location, RestorationState> activeRestorations = new ConcurrentHashMap<>();
   private static final Random random = new Random();
 
   @EventHandler
@@ -57,31 +57,26 @@ public class Restoration implements Listener {
     block.getWorld().playSound(claySound, block.getLocation());
     event.getPlayer().swingMainHand();
 
-    state.animationTask = new BukkitRunnable() {
-      @Override
-      public void run() {
-        float dx = (random.nextFloat() * 0.1f) - 0.05f;
-        float dy = (random.nextFloat() * 0.1f) - 0.05f;
-        float dz = (random.nextFloat() * 0.1f) - 0.05f;
+    state.animationTask = Bukkit.getRegionScheduler().runAtFixedRate(Main.getPlugin(), loc, scheduledTask -> {
+      float dx = (random.nextFloat() * 0.1f) - 0.05f;
+      float dy = (random.nextFloat() * 0.1f) - 0.05f;
+      float dz = (random.nextFloat() * 0.1f) - 0.05f;
 
-        Transformation trans = display.getTransformation();
-        display.setTransformation(new Transformation(
-                new Vector3f(dx, dy, dz),
-                trans.getLeftRotation(),
-                trans.getScale(),
-                trans.getRightRotation()
-        ));
-        display.setInterpolationDuration(2);
-        display.setInterpolationDelay(0);
-      }
-    }.runTaskTimer(Main.getPlugin(), 0L, 2L);
+      Transformation trans = display.getTransformation();
+      display.setTransformation(new Transformation(
+              new Vector3f(dx, dy, dz),
+              trans.getLeftRotation(),
+              trans.getScale(),
+              trans.getRightRotation()
+      ));
+      display.setInterpolationDuration(2);
+      display.setInterpolationDelay(0);
+    }, 1L, 2L); // Задержка 1 тик (не может быть 0), период 2 тика
 
-    state.timeoutTask = new BukkitRunnable() {
-      @Override
-      public void run() {
-        endRestoration(loc, false);
-      }
-    }.runTaskLater(Main.getPlugin(), 100L);
+    // 3. Используем RegionScheduler для таймаута
+    state.timeoutTask = Bukkit.getRegionScheduler().runDelayed(Main.getPlugin(), loc, scheduledTask -> {
+      endRestoration(loc, false);
+    }, 100L);
   }
 
   public static final Sound shovelSound = Sound.sound(
@@ -126,8 +121,9 @@ public class Restoration implements Listener {
     RestorationState state = activeRestorations.remove(loc);
     if (state == null) return;
 
-    state.animationTask.cancel();
-    state.timeoutTask.cancel();
+    if (state.animationTask != null) state.animationTask.cancel();
+    if (state.timeoutTask != null) state.timeoutTask.cancel();
+
     state.display.remove();
 
     Block block = loc.getBlock();
@@ -143,8 +139,8 @@ public class Restoration implements Listener {
   private static class RestorationState {
     BlockDisplay display;
     BlockFace face;
-    BukkitTask animationTask;
-    BukkitTask timeoutTask;
+    ScheduledTask animationTask;
+    ScheduledTask timeoutTask;
 
     RestorationState(BlockDisplay display, BlockFace face) {
       this.display = display;

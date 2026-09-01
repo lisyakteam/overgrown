@@ -54,9 +54,7 @@ public class ChunkEvents implements Listener {
     Chunk chunk = event.getChunk();
     String chunkId = getChunkId(chunk);
     ScheduledTask task = activeChunkTasks.remove(chunkId);
-    if (task != null) {
-      task.cancel();
-    }
+    if (task != null) task.cancel();
   }
 
   private void startActiveChunkTask(Chunk chunk) {

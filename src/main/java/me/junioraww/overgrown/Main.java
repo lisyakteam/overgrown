@@ -119,17 +119,13 @@ public class Main extends JavaPlugin {
           if (toPlace != null) {
             BlockData blockData = toPlace.createBlockData();
 
-            if (blockData instanceof Leaves leaves) {
-              leaves.setPersistent(true);
-            }
+            if (blockData instanceof Leaves leaves) leaves.setPersistent(true);
 
             else if (blockData instanceof MultipleFacing facing) {
               BlockFace attachFace = randomFace.getOppositeFace();
               if (facing.getAllowedFaces().contains(attachFace)) {
                 facing.setFace(attachFace, true);
-              } else {
-                continue;
-              }
+              } else continue;
             }
 
             adjacent.setBlockData(blockData, false);
