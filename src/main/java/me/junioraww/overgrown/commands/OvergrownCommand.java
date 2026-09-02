@@ -41,6 +41,7 @@ public class OvergrownCommand implements CommandExecutor {
             sender.sendRichMessage("<red>Specify a world name.");
             return true;
           }
+
           String worldToAdd = args[2];
           if (Config.getWhitelistedWorlds().add(worldToAdd)) {
             worldsList.add(worldToAdd);

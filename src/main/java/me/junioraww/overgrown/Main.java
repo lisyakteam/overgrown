@@ -58,6 +58,8 @@ public class Main extends JavaPlugin {
     Config.setBlocksPerCycle(getConfig().getInt("settings.blocks-per-cycle", 10));
     Config.setMaxCatchupCycles(getConfig().getInt("settings.max-catchup-cycles", 100));
 
+    Config.setRecoveryEnabled(getConfig().getBoolean("restoration.enabled", true));
+
     Config.getWhitelistedWorlds().clear();
     Config.getWhitelistedWorlds().addAll(getConfig().getStringList("whitelisted-worlds"));
 

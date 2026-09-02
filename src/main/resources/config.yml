@@ -15,7 +15,10 @@ target-blocks:
   - "#minecraft:slabs"
   - "#minecraft:terracotta"
   - "#minecraft:stone_bricks"
+  - "minecraft: cobblestone"
   - "BRICKS"
 replace-blocks:
   STONE_BRICKS: CRACKED_STONE_BRICKS
   POLISHED_BLACKSTONE_BRICKS: CRACKED_POLISHED_BLACKSTONE_BRICKS
+restoration:
+  enabled: true

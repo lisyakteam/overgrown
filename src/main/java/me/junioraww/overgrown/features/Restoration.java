@@ -2,6 +2,7 @@ package me.junioraww.overgrown.features;
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import me.junioraww.overgrown.Main;
+import me.junioraww.overgrown.utils.Config;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
@@ -32,6 +33,7 @@ public class Restoration implements Listener {
 
   @EventHandler
   public void clayClick(PlayerInteractEvent event) {
+    if (!Config.isRecoveryEnabled()) return;
     if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
     if (event.getHand() != EquipmentSlot.HAND) return;
 
@@ -57,7 +59,7 @@ public class Restoration implements Listener {
     block.getWorld().playSound(claySound, block.getLocation());
     event.getPlayer().swingMainHand();
 
-    state.animationTask = Bukkit.getRegionScheduler().runAtFixedRate(Main.getPlugin(), loc, scheduledTask -> {
+    state.animationTask = Bukkit.getRegionScheduler().runAtFixedRate(Main.getPlugin(), loc, _ -> {
       float dx = (random.nextFloat() * 0.1f) - 0.05f;
       float dy = (random.nextFloat() * 0.1f) - 0.05f;
       float dz = (random.nextFloat() * 0.1f) - 0.05f;
@@ -71,24 +73,24 @@ public class Restoration implements Listener {
       ));
       display.setInterpolationDuration(2);
       display.setInterpolationDelay(0);
-    }, 1L, 2L); // Задержка 1 тик (не может быть 0), период 2 тика
-
-    // 3. Используем RegionScheduler для таймаута
-    state.timeoutTask = Bukkit.getRegionScheduler().runDelayed(Main.getPlugin(), loc, scheduledTask -> {
+    }, 1L, 2L);
+    
+    state.timeoutTask = Bukkit.getRegionScheduler().runDelayed(Main.getPlugin(), loc, _ -> {
       endRestoration(loc, false);
     }, 100L);
   }
 
   public static final Sound shovelSound = Sound.sound(
-          Key.key("minecraft:item.shovel.flatten"), Sound.Source.PLAYER, 1f, 1f
+          Key.key("minecraft", "item.shovel.flatten"), Sound.Source.PLAYER, 1f, 1f
   );
 
   public static final Sound claySound = Sound.sound(
-          Key.key("minecraft:item.hoe.till"), Sound.Source.PLAYER, 1f, 1f
+          Key.key("minecraft", "item.hoe.till"), Sound.Source.PLAYER, 1f, 1f
   );
 
   @EventHandler
   public void shovelClick(PlayerInteractEvent event) {
+    if (!Config.isRecoveryEnabled()) return;
     if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
     if (event.getHand() != EquipmentSlot.HAND) return;
 

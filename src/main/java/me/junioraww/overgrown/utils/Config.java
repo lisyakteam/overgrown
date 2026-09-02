@@ -81,4 +81,8 @@ public class Config {
   public static void setLastUpdateKey(NamespacedKey lastUpdateKey) {
     Config.lastUpdateKey = lastUpdateKey;
   }
+
+  public static void setRecoveryEnabled(boolean value) {
+    Config.recoveryEnabled = value;
+  }
 }
