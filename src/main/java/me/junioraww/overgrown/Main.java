@@ -6,6 +6,7 @@ import me.junioraww.overgrown.listeners.ChunkEvents;
 import me.junioraww.overgrown.listeners.PlayerActivityEvents;
 import me.junioraww.overgrown.utils.ChunkActivityManager;
 import me.junioraww.overgrown.utils.Config;
+import me.junioraww.overgrown.utils.ConfigMigrator;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -41,6 +42,7 @@ public class Main extends JavaPlugin {
     plugin = this;
 
     saveDefaultConfig();
+    ConfigMigrator.migrate(this);
     loadConfiguration();
     Config.setLastUpdateKey(
             new NamespacedKey(this, "last_growth_time")

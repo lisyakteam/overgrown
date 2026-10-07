@@ -18,6 +18,12 @@ repositories {
 
 dependencies {
     paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:26.2.build.84-stable")
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 def targetJavaVersion = 25
