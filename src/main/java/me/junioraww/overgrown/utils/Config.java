@@ -15,12 +15,22 @@ public class Config {
   private static int maxCatchupCycles;
   private static boolean recoveryEnabled;
 
-  private static Map<Material, Double> growthChances = new HashMap<>();
-  private static Set<Material> targetBlocks = new HashSet<>();
-  private static Map<Material, Material> replaceBlocks = new HashMap<>();
+  private static int inactivityDays = 3;
+  private static int inactivityHours = 0;
+  private static long inactivityMillis = 3 * 24L * 60 * 60 * 1000L;
+  private static boolean resetOnBlockPlace = true;
+  private static boolean resetOnBlockBreak = true;
+  private static boolean resetOnChestInteract = true;
+  private static boolean resetOnChestOpen = false;
+  private static boolean resetOnDoorOpen = false;
+
+  private static final Map<Material, Double> growthChances = new HashMap<>();
+  private static final Set<Material> targetBlocks = new HashSet<>();
+  private static final Map<Material, Material> replaceBlocks = new HashMap<>();
   public static Set<String> whitelistedWorlds = new HashSet<>();
 
   private static NamespacedKey lastUpdateKey;
+  private static NamespacedKey lastActivityKey;
 
   public static long getIntervalMillis() {
     return intervalMillis;
@@ -62,6 +72,42 @@ public class Config {
     return lastUpdateKey;
   }
 
+  public static NamespacedKey getLastActivityKey() {
+    return lastActivityKey;
+  }
+
+  public static int getInactivityDays() {
+    return inactivityDays;
+  }
+
+  public static int getInactivityHours() {
+    return inactivityHours;
+  }
+
+  public static long getInactivityMillis() {
+    return inactivityMillis;
+  }
+
+  public static boolean isResetOnBlockPlace() {
+    return resetOnBlockPlace;
+  }
+
+  public static boolean isResetOnBlockBreak() {
+    return resetOnBlockBreak;
+  }
+
+  public static boolean isResetOnChestInteract() {
+    return resetOnChestInteract;
+  }
+
+  public static boolean isResetOnChestOpen() {
+    return resetOnChestOpen;
+  }
+
+  public static boolean isResetOnDoorOpen() {
+    return resetOnDoorOpen;
+  }
+
   public static void setBlocksPerCycle(int value) {
     blocksPerCycle = value;
   }
@@ -80,6 +126,36 @@ public class Config {
 
   public static void setLastUpdateKey(NamespacedKey lastUpdateKey) {
     Config.lastUpdateKey = lastUpdateKey;
+  }
+
+  public static void setLastActivityKey(NamespacedKey lastActivityKey) {
+    Config.lastActivityKey = lastActivityKey;
+  }
+
+  public static void setInactivityDuration(int days, int hours) {
+    inactivityDays = Math.max(0, days);
+    inactivityHours = Math.max(0, hours);
+    inactivityMillis = (inactivityDays * 24L + inactivityHours) * 3600L * 1000L;
+  }
+
+  public static void setResetOnBlockPlace(boolean value) {
+    resetOnBlockPlace = value;
+  }
+
+  public static void setResetOnBlockBreak(boolean value) {
+    resetOnBlockBreak = value;
+  }
+
+  public static void setResetOnChestInteract(boolean value) {
+    resetOnChestInteract = value;
+  }
+
+  public static void setResetOnChestOpen(boolean value) {
+    resetOnChestOpen = value;
+  }
+
+  public static void setResetOnDoorOpen(boolean value) {
+    resetOnDoorOpen = value;
   }
 
   public static void setRecoveryEnabled(boolean value) {

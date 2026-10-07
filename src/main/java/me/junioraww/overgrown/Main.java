@@ -3,6 +3,8 @@ package me.junioraww.overgrown;
 import me.junioraww.overgrown.commands.OvergrownCommand;
 import me.junioraww.overgrown.features.Restoration;
 import me.junioraww.overgrown.listeners.ChunkEvents;
+import me.junioraww.overgrown.listeners.PlayerActivityEvents;
+import me.junioraww.overgrown.utils.ChunkActivityManager;
 import me.junioraww.overgrown.utils.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -21,12 +23,17 @@ import java.util.*;
 public class Main extends JavaPlugin {
   private static Main plugin;
   private ChunkEvents chunkEvents;
+  private ChunkActivityManager activityManager;
 
   private final Random random = new Random();
   private final BlockFace[] faces = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
 
   public static Main getPlugin() {
     return plugin;
+  }
+
+  public ChunkActivityManager getActivityManager() {
+    return activityManager;
   }
 
   @Override
@@ -38,9 +45,14 @@ public class Main extends JavaPlugin {
     Config.setLastUpdateKey(
             new NamespacedKey(this, "last_growth_time")
     );
+    Config.setLastActivityKey(
+            new NamespacedKey(this, "last_activity_time")
+    );
 
-    chunkEvents = new ChunkEvents();
+    activityManager = new ChunkActivityManager();
+    chunkEvents = new ChunkEvents(activityManager);
     getServer().getPluginManager().registerEvents(chunkEvents, this);
+    getServer().getPluginManager().registerEvents(new PlayerActivityEvents(activityManager), this);
     getServer().getPluginManager().registerEvents(new Restoration(), this);
     getCommand("overgrown").setExecutor(new OvergrownCommand(this));
   }
@@ -48,7 +60,9 @@ public class Main extends JavaPlugin {
   @Override
   public void onDisable() {
     plugin = null;
-    chunkEvents.stop();
+    if (chunkEvents != null) {
+      chunkEvents.stop();
+    }
   }
 
   public void loadConfiguration() {
@@ -59,6 +73,16 @@ public class Main extends JavaPlugin {
     Config.setMaxCatchupCycles(getConfig().getInt("settings.max-catchup-cycles", 100));
 
     Config.setRecoveryEnabled(getConfig().getBoolean("restoration.enabled", true));
+
+    int days = getConfig().getInt("inactivity.days", 3);
+    int hours = getConfig().getInt("inactivity.hours", 0);
+    Config.setInactivityDuration(days, hours);
+
+    Config.setResetOnBlockPlace(getConfig().getBoolean("inactivity.reset-actions.block-place", true));
+    Config.setResetOnBlockBreak(getConfig().getBoolean("inactivity.reset-actions.block-break", true));
+    Config.setResetOnChestInteract(getConfig().getBoolean("inactivity.reset-actions.chest-interact", true));
+    Config.setResetOnChestOpen(getConfig().getBoolean("inactivity.reset-actions.chest-open", false));
+    Config.setResetOnDoorOpen(getConfig().getBoolean("inactivity.reset-actions.door-open", false));
 
     Config.getWhitelistedWorlds().clear();
     Config.getWhitelistedWorlds().addAll(getConfig().getStringList("whitelisted-worlds"));

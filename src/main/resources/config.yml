@@ -15,10 +15,23 @@ target-blocks:
   - "#minecraft:slabs"
   - "#minecraft:terracotta"
   - "#minecraft:stone_bricks"
-  - "minecraft: cobblestone"
+  - "minecraft:cobblestone"
   - "BRICKS"
 replace-blocks:
   STONE_BRICKS: CRACKED_STONE_BRICKS
   POLISHED_BLACKSTONE_BRICKS: CRACKED_POLISHED_BLACKSTONE_BRICKS
 restoration:
   enabled: true
+inactivity:
+  # Chunks only overgrow if players haven't interacted with them for this duration.
+  # Configured in days and hours (default: 3 days, 0 hours).
+  days: 3
+  hours: 0
+  # Actions performed by players that reset the inactivity timer for that chunk.
+  # Defaults: placing and breaking blocks, and interacting with chests.
+  reset-actions:
+    block-place: true
+    block-break: true
+    chest-interact: true # taking an item or placing an item in a chest
+    chest-open: false    # opening a chest
+    door-open: false     # opening a door or hatch (trapdoor)

@@ -2,6 +2,7 @@ package me.junioraww.overgrown.listeners;
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import me.junioraww.overgrown.Main;
+import me.junioraww.overgrown.utils.ChunkActivityManager;
 import me.junioraww.overgrown.utils.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -16,10 +17,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ChunkEvents implements Listener {
   private final Map<String, ScheduledTask> activeChunkTasks = new ConcurrentHashMap<>();
+  private final ChunkActivityManager activityManager;
+
+  public ChunkEvents(ChunkActivityManager activityManager) {
+    this.activityManager = activityManager;
+  }
 
   public void stop() {
     activeChunkTasks.values().forEach(ScheduledTask::cancel);
     activeChunkTasks.clear();
+    activityManager.clearAllCache();
   }
 
   @EventHandler
@@ -30,6 +37,18 @@ public class ChunkEvents implements Listener {
 
     long now = System.currentTimeMillis();
     Long lastTime = chunk.getPersistentDataContainer().get(Config.getLastUpdateKey(), PersistentDataType.LONG);
+    Long lastActivity = activityManager.getLastActivity(chunk);
+
+    if (Config.getInactivityMillis() > 0 && lastActivity != null) {
+      long activityExpiry = lastActivity + Config.getInactivityMillis();
+      if (now < activityExpiry) {
+        startActiveChunkTask(chunk);
+        return;
+      }
+      if (lastTime == null || lastTime < activityExpiry) {
+        lastTime = activityExpiry;
+      }
+    }
 
     if (lastTime == null) {
       chunk.getPersistentDataContainer().set(Config.getLastUpdateKey(), PersistentDataType.LONG, now);
@@ -55,6 +74,7 @@ public class ChunkEvents implements Listener {
     String chunkId = getChunkId(chunk);
     ScheduledTask task = activeChunkTasks.remove(chunkId);
     if (task != null) task.cancel();
+    activityManager.clearChunkCache(chunk.getWorld().getUID(), chunk.getX(), chunk.getZ());
   }
 
   private void startActiveChunkTask(Chunk chunk) {
@@ -68,8 +88,12 @@ public class ChunkEvents implements Listener {
                 activeChunkTasks.remove(chunkId);
                 return;
               }
+              long now = System.currentTimeMillis();
+              if (activityManager.isChunkProtectedByActivity(chunk, now)) {
+                return;
+              }
               Main.getPlugin().processOvergrowth(chunk, Config.getBlocksPerCycle());
-              chunk.getPersistentDataContainer().set(Config.getLastUpdateKey(), PersistentDataType.LONG, System.currentTimeMillis());
+              chunk.getPersistentDataContainer().set(Config.getLastUpdateKey(), PersistentDataType.LONG, now);
             },
             intervalTicks, intervalTicks
     );
